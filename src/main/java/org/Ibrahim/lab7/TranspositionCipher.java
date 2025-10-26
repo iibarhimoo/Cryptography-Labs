@@ -1,118 +1,104 @@
 package org.Ibrahim.lab7;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Scanner;
 
-class TranspositionCipher {
-    public static void main(String[] args) {
-        System.out.println("*******TRANSPOSITION CIPHER*******");
-        Scanner in = new Scanner(System.in);
-        System.out.println("Enter the choice:");
-        System.out.println("1. Plain text to cipher text.");
-        System.out.println("2. cipher text to plain text.");
-        int choice = in.nextInt();
+public class TranspositionCipher {
 
-        switch (choice) {
-            case 1:
-                findTranspositionCipher();
-                break;
-            case 2:
-                DecryptTranspositionCipher();
-                break;
-            default:
-                System.out.println("Invalid choice");
-                break;
-        }
-    }
+    // Encrypts the plaintext using columnar transposition
+    public static String encrypt(String plaintext, String key) {
+        // Remove spaces from plaintext and convert to uppercase
+        plaintext = plaintext.replaceAll(" ", "").toUpperCase();
+        key = key.toUpperCase();
 
-    public static void findTranspositionCipher() {
-        Scanner in = new Scanner(System.in);
-        String plainText;
-        String cipherText = "", jpt = "XYZ"; // Simpler padding
-        int c = 0, l = 0, v = 0, i = 0, padding = 0;
+        int numCols = key.length();
+        int numRows = (int) Math.ceil((double) plaintext.length() / numCols);
 
-        // *** SYNTAX ERROR FIXED *** (Added missing [])
-        char mat[][];
-        int key[] = { 4, 3, 1, 2, 5, 6, 7 };
+        char[][] matrix = new char[numRows][numCols];
+        int textIndex = 0;
 
-        System.out.println("Enter the plain text:");
-        plainText = in.nextLine().replaceAll("\\s", ""); // Read line, remove spaces
-
-        // Calculate rows needed
-        v = (int) Math.ceil((double) plainText.length() / key.length);
-        mat = new char[v][key.length];
-
-        // --- Simplified Matrix-Fill Loop ---
-        c = 0; // index for plaintext
-        for (i = 0; i < v; i++) { // rows
-            for (int j = 0; j < key.length; j++) { // cols
-                if (c < plainText.length()) {
-                    mat[i][j] = plainText.charAt(c++);
+        // Fill the matrix row by row
+        for (int i = 0; i < numRows; i++) {
+            for (int j = 0; j < numCols; j++) {
+                if (textIndex < plaintext.length()) {
+                    matrix[i][j] = plaintext.charAt(textIndex++);
                 } else {
-                    // Pad with 'X', 'Y', 'Z', etc.
-                    mat[i][j] = jpt.charAt(padding++ % jpt.length());
+                    matrix[i][j] = 'X'; // Padding character
                 }
             }
         }
 
-        // --- Read-out Loop (Original logic was correct) ---
-        c = 1; // key order (1, 2, 3...)
-        while (c <= key.length) {
-            for (i = 0; i < key.length; i++) { // i is the column index
-                if (key[i] == c) {
-                    for (l = 0; l < v; l++) { // l is the row index
-                        cipherText = cipherText + mat[l][i];
-                    }
-                }
-            }
-            c++;
+        // Determine column order based on key
+        Integer[] colOrder = new Integer[numCols];
+        for (int i = 0; i < numCols; i++) {
+            colOrder[i] = i;
         }
 
-        cipherText = cipherText.toUpperCase();
-        System.out.println("\nThe Cipher Text is:\n" + cipherText);
+        // Sort column order based on key characters
+        Arrays.sort(colOrder, Comparator.comparingInt(key::charAt));
+
+        StringBuilder ciphertext = new StringBuilder();
+        // Read columns in sorted order
+        for (int col : colOrder) {
+            for (int i = 0; i < numRows; i++) {
+                ciphertext.append(matrix[i][col]);
+            }
+        }
+        return ciphertext.toString();
     }
 
-    public static void DecryptTranspositionCipher() {
-        Scanner in = new Scanner(System.in);
-        String plainText = "", cipherText;
-        int c = 0, l = 1, v = 0, i = 0, j = 0, k = 0;
+    // Decrypts the ciphertext using columnar transposition
+    public static String decrypt(String ciphertext, String key) {
+        key = key.toUpperCase();
+        int numCols = key.length();
+        int numRows = ciphertext.length() / numCols;
 
-        // *** SYNTAX ERROR FIXED *** (Added missing [])
-        char mat[][];
-        int key[] = { 4, 3, 1, 5, 2};
+        char[][] matrix = new char[numRows][numCols];
 
-        System.out.println("Enter the Cipher text:");
-        cipherText = in.nextLine();
-
-        // Calculate number of rows
-        v = (cipherText.length() / key.length);
-        if (cipherText.length() % key.length != 0) {
-            System.out.println("Ciphertext length is not valid for this key.");
-            return;
+        // Determine column order based on key (same as encryption)
+        Integer[] colOrder = new Integer[numCols];
+        for (int i = 0; i < numCols; i++) {
+            colOrder[i] = i;
         }
+        Arrays.sort(colOrder, Comparator.comparingInt(key::charAt));
 
-        mat = new char[v][key.length];
-
-        // --- Fill-in Loop (Original logic was correct) ---
-        c = 0; // key order (0, 1, 2...)
-        while (c < key.length) {
-            for (j = 0; j < key.length; j++) { // j is col index
-                // *** SYNTAX ERROR FIXED *** (==)
-                if (key[j] == c + 1) {
-                    for (i = 0; i < v; i++) { // i is row index
-                        mat[i][j] = cipherText.charAt(k++);
-                    }
-                }
-            }
-            c++;
-        }
-
-        // --- Read-out Loop (Original logic was correct) ---
-        for (int p = 0; p < v; p++) {
-            for (int q = 0; q < key.length; q++) {
-                plainText = plainText + mat[p][q];
+        int cipherIndex = 0;
+        // Fill the matrix column by column, in the sorted order
+        for (int col : colOrder) {
+            for (int i = 0; i < numRows; i++) {
+                matrix[i][col] = ciphertext.charAt(cipherIndex++);
             }
         }
 
-        System.out.println("\nThe Plain text is:\n" + plainText);
+        StringBuilder decryptedText = new StringBuilder();
+        // Read the matrix row by row
+        for (int i = 0; i < numRows; i++) {
+            for (int j = 0; j < numCols; j++) {
+                decryptedText.append(matrix[i][j]);
+            }
+        }
+
+        // *** THIS IS THE FIXED LINE ***
+        // Remove one or more padding 'X's from the very end
+        return decryptedText.toString().replaceAll("X+$", "");
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Enter plaintext: ");
+        String plaintext = scanner.nextLine();
+
+        System.out.print("Enter key: ");
+        String key = scanner.nextLine();
+
+        String encryptedText = encrypt(plaintext, key);
+        System.out.println("Encrypted text: " + encryptedText);
+
+        String decryptedText = decrypt(encryptedText, key);
+        System.out.println("Decrypted text: " + decryptedText);
+
+        scanner.close();
     }
 }
