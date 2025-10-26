@@ -78,7 +78,7 @@ class TranspositionCipher {
 
         // *** SYNTAX ERROR FIXED *** (Added missing [])
         char mat[][];
-        int key[] = { 4, 3, 1, 2, 5, 6, 7 };
+        int key[] = { 4, 3, 1, 5, 2};
 
         System.out.println("Enter the Cipher text:");
         cipherText = in.nextLine();
