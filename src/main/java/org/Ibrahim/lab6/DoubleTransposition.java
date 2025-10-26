@@ -3,14 +3,14 @@ package org.Ibrahim.lab6;
 import java.io.*;
 import java.util.*;
 
-class NewDoubleTransposition {
+class DoubleTransposition {
     public static void main(String args[]) {
-        NewEncryptAndDecrypt ned = new NewEncryptAndDecrypt();
+        EncryptAndDecrypt ned = new EncryptAndDecrypt();
         ned.input();
     }
 }
 
-class NewEncryptAndDecrypt {
+class EncryptAndDecrypt {
     Scanner sc = new Scanner(System.in);
 
     void input() {
