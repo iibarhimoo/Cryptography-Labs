@@ -93,29 +93,58 @@ public class TranspositionCipher {
             }
         }
 
-        // *** THIS IS THE CORRECTED LINE ***
         // Remove one or more padding 'X's from the very end of the string
         return decryptedText.toString().replaceAll("X+$", "");
     }
 
     /**
-     * Main method to run the program.
+     * Main method to run the program with a user menu.
      */
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
+        int choice;
 
-        System.out.print("Enter plaintext: ");
-        String plaintext = scanner.nextLine();
+        do {
+            System.out.println("\n--- Transposition Cipher Menu ---");
+            System.out.println("1. Encrypt");
+            System.out.println("2. Decrypt");
+            System.out.println("0. Exit");
+            System.out.print("Enter your choice: ");
 
-        System.out.print("Enter key: ");
-        String key = scanner.nextLine();
+            choice = scanner.nextInt();
+            scanner.nextLine(); // Consume the newline left-over
 
-        String encryptedText = encrypt(plaintext, key);
-        System.out.println("Encrypted text: " + encryptedText);
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter plaintext: ");
+                    String plaintext = scanner.nextLine();
+                    System.out.print("Enter key: ");
+                    String keyEncrypt = scanner.nextLine();
 
-        String decryptedText = decrypt(encryptedText, key);
-        System.out.println("Decrypted text: " + decryptedText);
+                    String encryptedText = encrypt(plaintext, keyEncrypt);
+                    System.out.println("Encrypted text: " + encryptedText);
+                    break;
+
+                case 2:
+                    System.out.print("Enter ciphertext: ");
+                    String ciphertext = scanner.nextLine();
+                    System.out.print("Enter key: ");
+                    String keyDecrypt = scanner.nextLine();
+
+                    String decryptedText = decrypt(ciphertext, keyDecrypt);
+                    System.out.println("Decrypted text: " + decryptedText);
+                    break;
+
+                case 0:
+                    System.out.println("Exiting...");
+                    break;
+
+                default:
+                    System.out.println("Invalid choice. Please enter 1, 2, or 0.");
+            }
+        } while (choice != 0);
 
         scanner.close();
     }
 }
+
