@@ -2,97 +2,129 @@ package org.Ibrahim.lab4;
 import java.util.*;
 import java.io.*;
 
-public class Vigenerecipher {
-    public static String key = new String();
-    public String extndkey;
-    public String plaintxt, ciphertxt;
-    public String ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-    int row, flag = 0, decrypt = 0;
+class GFG
+{
 
-    public String keyextnsn(String ptxt, String keytxt) {
-        int i, j = 0, n;
-        String nukey = "";
-        for (i = 0; i < ptxt.length(); i++) {
-            nukey += keytxt.charAt(j);
-            j++;
-            if (j == keytxt.length())
-                j = 0;
-        }
-        return nukey;
-    }
+    // This function generates the key in
+    // a cyclic manner until its length is
+    // equal to the length of original text
+    static String generateKey(String str, String key)
+    {
+        int x = str.length();
 
-    public int valueofchar(char x) {
-        int i, pos = 0;
-        for (i = 0; i < 26; i++) {
-            if (x == ALPHABET.charAt(i)) {
-                pos = i;
+        for (int i = 0; ; i++)
+        {
+            if (x == i)
+                i = 0;
+            if (key.length() == str.length())
                 break;
-            }
+            key+=(key.charAt(i));
         }
-        return pos;
+        return key;
     }
 
-    public char charofvalue(int y) {
-        int i;
-        char ch;
-        ch = ALPHABET.charAt(y);
-        return ch;
-    }
+    // This function returns the encrypted text
+    // generated with the help of the key
+    static String cipherText(String str, String key)
+    {
+        String cipher_text="";
 
-    public String vcencryption(String txt) {
-        int i, j, p = 0, k = 0, tmp1 = 0;
-        char tmp;
-        String ctxt = "";
-        extndkey = keyextnsn(txt, key);
-        System.out.println("VIGENERE ENCRYPTION");
-        System.out.println("PLAIN TEXT: " + txt);
-        System.out.println("VIGENERE KEY: " + extndkey);
-        for (i = 0; i < txt.length(); i++) {
-            p = valueofchar(txt.charAt(i));
-            k = valueofchar(extndkey.charAt(i));
-            tmp1 = (p + k) % 26;
-            tmp = charofvalue(tmp1);
-            ctxt += tmp;
+        for (int i = 0; i < str.length(); i++)
+        {
+            // converting in range 0-25
+            // This is the Vigenere encryption formula: C = (P + K) mod 26
+            // Note: This simple formula only works if the letters are already 0-25.
+            // The code is combining steps. Let's fix the logic to be clearer.
+
+            // 1. Convert plaintext char to 0-25
+            int p = (str.charAt(i) - 'A');
+            // 2. Convert key char to 0-25
+            int k = (key.charAt(i) - 'A');
+
+            // 3. Apply formula
+            int x = (p + k) % 26;
+
+            // 4. convert back into alphabets(ASCII)
+            x += 'A';
+
+            cipher_text+=(char)(x);
         }
-        return ctxt;
+        return cipher_text;
     }
 
-    public String vcdecryption(String txt) {
-        int i, c = 0, k = 0, tmp1 = 0;
-        char ch;
-        String ptxt = "";
-        System.out.println("VIGENERE DECRYPTION");
-        System.out.println("CIPHER TEXT: " + txt);
-        System.out.println("VIGENERE KEY: " + extndkey);
-        for (i = 0; i < txt.length(); i++) {
-            c = valueofchar(txt.charAt(i));
-            k = valueofchar(extndkey.charAt(i));
-            // Corrected formula
-            tmp1 = (c - k + 26) % 26;
-            ch = charofvalue(tmp1);
-            ptxt += ch;
+    // This function decrypts the encrypted text
+    // and returns the original text
+    static String originalText(String cipher_text, String key)
+    {
+        String orig_text="";
+
+        for (int i = 0 ; i < cipher_text.length() &&
+                i < key.length(); i++)
+        {
+            // 1. Convert ciphertext char to 0-25
+            int c = (cipher_text.charAt(i) - 'A');
+            // 2. Convert key char to 0-25
+            int k = (key.charAt(i) - 'A');
+
+            // 3. This is the Vigenere decryption formula: P = (C - K + 26) mod 26
+            int x = (c - k + 26) % 26;
+
+            // 4. convert back into alphabets(ASCII)
+            x += 'A';
+            orig_text+=(char)(x);
         }
-        return ptxt;
+        return orig_text;
     }
 
-    public static void main(String[] args) {
-        Vigenerecipher vc = new Vigenerecipher();
-        Scanner sc = new Scanner(System.in);
-        System.out.println("ENTER KEY");
-        key = sc.next();
-        String text = new String();
-        System.out.println("Enter PLAIN TEXT");
-        text = sc.next();
-        String ciphertext = new String();
-        ciphertext = vc.vcencryption(text);
-        System.out.println();
-        System.out.println("CIPHER TEXT:" + ciphertext);
-        System.out.println();
-        String plaintext = new String();
-        plaintext = vc.vcdecryption(ciphertext);
-        System.out.println();
-        System.out.println("PLAIN TEXT:" + plaintext);
-        sc.close();
+    // This function will convert the lower case character to Upper case
+    // and remove spaces
+    static String LowerToUpper(String s)
+    {
+        // Remove all non-alphabetic characters (like spaces)
+        String cleaned = s.replaceAll("[^a-zA-Z]", "");
+
+        // Convert to uppercase
+        return cleaned.toUpperCase();
+    }
+
+    // Driver code
+    public static void main(String[] args)
+    {
+        // 1. Use only ONE scanner for all input
+        Scanner scanner = new Scanner(System.in);
+
+        // 2. Prompt for and read the plaintext
+        System.out.print("Enter plaintext: ");
+        String plainTextInput = scanner.nextLine();
+
+        // 3. Prompt for and read the key
+        System.out.print("Enter key: ");
+        String keywordInput = scanner.nextLine();
+
+        // 4. Close the scanner
+        scanner.close();
+
+        // 5. Now, pass the input STRINGS to your methods
+        // LowerToUpper also removes spaces now
+        String str = LowerToUpper(plainTextInput);
+        String keyword = LowerToUpper(keywordInput);
+
+        if (str.isEmpty() || keyword.isEmpty()) {
+            System.out.println("Plaintext or key is empty after cleaning. Exiting.");
+            return;
+        }
+
+        // The rest of your code works perfectly
+        String key = generateKey(str, keyword);
+        String cipher_text = cipherText(str, key);
+
+        System.out.println("\nPlaintext (Cleaned): " + str);
+        System.out.println("Key (Generated)  : " + key);
+        System.out.println("Ciphertext : "
+                + cipher_text + "\n");
+
+        System.out.println("Decrypted Text : "
+                + originalText(cipher_text, key));
     }
 }
