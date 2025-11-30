@@ -1,22 +1,16 @@
 package org.Ibrahim.lab8;
 
 import java.io.*;
+import java.util.Scanner;
 
-class rc4 {
-    public static void main(String args[]) throws IOException {
-        int temp = 0;
-        String ptext;
-        String key;
-        int s[] = new int[256];
-        int k[] = new int[256];
+class RC4 {
+    public static void main(String args[]) {
+        Scanner in = new Scanner(System.in);
 
-        // Use BufferedReader instead of deprecated DataInputStream
-        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-
-        System.out.print("\nENTER PLAIN TEXT\t");
-        ptext = in.readLine();
-        System.out.print("\n\nENTER KEY TEXT\t\t");
-        key = in.readLine();
+        System.out.print("ENTER PLAIN TEXT: ");
+        String ptext = in.nextLine();
+        System.out.print("ENTER KEY TEXT: ");
+        String key = in.nextLine();
 
         char ptextc[] = ptext.toCharArray();
         char keyc[] = key.toCharArray();
@@ -32,15 +26,17 @@ class rc4 {
             keyi[i] = (int) keyc[i];
         }
 
-        // --- KSA (Key-Scheduling Algorithm) ---
-        // *** LOGICAL ERROR FIXED *** (Loop must run to 256)
+        int s[] = new int[256];
+        int k[] = new int[256];
+
+        // KSA (Key-Scheduling Algorithm)
         for (int i = 0; i < 256; i++) {
             s[i] = i;
             k[i] = keyi[i % key.length()];
         }
 
         int j = 0;
-        // *** LOGICAL ERROR FIXED *** (Loop must run to 256)
+        int temp;
         for (int i = 0; i < 256; i++) {
             j = (j + s[i] + k[i]) % 256;
             temp = s[i];
@@ -48,37 +44,32 @@ class rc4 {
             s[j] = temp;
         }
 
-        // --- PRGA (Pseudo-Random Generation Algorithm) ---
+        // PRGA (Pseudo-Random Generation Algorithm)
         int i = 0;
         j = 0;
-        int z = 0;
+        int z;
         for (int l = 0; l < ptext.length(); l++) {
-            // *** CRITICAL LOGIC FIXED ***
-            // 'i' must be incremented from its previous state, not based on 'l'
             i = (i + 1) % 256;
             j = (j + s[i]) % 256;
-
             temp = s[i];
             s[i] = s[j];
             s[j] = temp;
 
             z = s[(s[i] + s[j]) % 256];
             cipher[l] = z ^ ptexti[l];
-            decrypt[l] = z ^ cipher[l]; // Decryption is the same XOR operation
+            decrypt[l] = z ^ cipher[l];
         }
 
-        System.out.print("\n\nENCRYPTED:\t\t");
+        System.out.print("ENCRYPTED: ");
         display(cipher);
-        System.out.print("\n\nDECRYPTED:\t\t");
+        System.out.print("\nDECRYPTED: ");
         display(decrypt);
-        System.out.println(); // Added for cleaner output
+        System.out.println();
     }
 
     static void display(int disp[]) {
-        char convert[] = new char[disp.length];
         for (int l = 0; l < disp.length; l++) {
-            convert[l] = (char) disp[l];
-            System.out.print(convert[l]);
+            System.out.print((char) disp[l]);
         }
     }
 }
